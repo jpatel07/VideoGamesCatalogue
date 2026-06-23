@@ -12,10 +12,10 @@ namespace API.Controllers
     [ApiController]
     public class VideoGamesController : ControllerBase
     {
-   
+
         private readonly IVideoGameService _gameService;
 
-        public VideoGamesController(IVideoGameService gameService )
+        public VideoGamesController(IVideoGameService gameService)
         {
             _gameService = gameService;
         }
@@ -24,6 +24,23 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<VideoGameDto>>> GetVideoGames()
         {
             return Ok(await _gameService.GetGamesAsync());
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateGame(int id, VideoGameDto game)
+        {
+            if (id != game.Id)
+                return BadRequest();
+
+            try
+            {
+                await _gameService.UpdateAsync(game);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
     }
 }
