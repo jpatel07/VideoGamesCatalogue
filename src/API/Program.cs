@@ -38,10 +38,10 @@ namespace API
                     await GamesCatalogueContextSeed.SeedAsync(context);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                throw ex ?? new Exception("Error Sedding data");
+                throw;
             }
 
 

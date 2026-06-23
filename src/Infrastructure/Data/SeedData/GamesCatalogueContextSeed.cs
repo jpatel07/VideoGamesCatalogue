@@ -15,8 +15,8 @@ namespace Infrastructure.Data.SeedData
                 return;
             }
 
-            var csvPath = "../Infrastructure/Data/SeedData/videogames_clean_with_schemaname.csv";
-            if(!File.Exists(csvPath))
+            var csvPath = ResolveSeedCsvPath("videogames_clean_with_schemaname.csv");
+            if (!File.Exists(csvPath))
             {
                 throw new FileNotFoundException(csvPath);
             }
@@ -77,6 +77,22 @@ namespace Infrastructure.Data.SeedData
 
             await context.VideoGames.AddRangeAsync(games);
             await context.SaveChangesAsync();
+        }
+
+        private static string? ResolveSeedCsvPath(string fileName)
+        {
+            var candidates = new[]
+            {
+                Path.Combine(AppContext.BaseDirectory, "Data", "SeedData", fileName),
+                Path.Combine(Directory.GetCurrentDirectory(), "Data", "SeedData", fileName),
+                Path.Combine(Directory.GetCurrentDirectory(), "src", "Infrastructure", "Data", "SeedData", fileName),
+                Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src", "Infrastructure", "Data", "SeedData", fileName))
+            };
+
+            var match = candidates.FirstOrDefault(File.Exists);
+            return match ?? throw new FileNotFoundException(
+                $"Seed CSV not found. Tried:{Environment.NewLine}{string.Join(Environment.NewLine, candidates)}");
+
         }
 
         private sealed class VideoGameCsvRow
