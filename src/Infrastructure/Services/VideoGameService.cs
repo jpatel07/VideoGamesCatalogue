@@ -30,12 +30,18 @@ namespace Infrastructure.Services
                     GamePlatform = d.GamePlatform,
                     Genre = d.Genre,
                     AggregateRating = d.AggregateRating
-                
+
                 }).ToListAsync();
         }
 
         public async Task UpdateAsync(VideoGameDto game)
         {
+            ArgumentNullException.ThrowIfNull(game.Name, nameof(game.Name));
+            ArgumentNullException.ThrowIfNull(game.Author, nameof(game.Author));
+            ArgumentNullException.ThrowIfNull(game.Description, nameof(game.Description));
+            ArgumentNullException.ThrowIfNull(game.GamePlatform, nameof(game.GamePlatform));
+            ArgumentNullException.ThrowIfNull(game.Genre, nameof(game.Genre));
+
             var entity = await _context.VideoGames.FirstOrDefaultAsync(g => g.Id == game.Id);
 
             if (entity is null)
