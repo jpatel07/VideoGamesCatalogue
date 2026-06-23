@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Core.DTO
@@ -7,12 +8,18 @@ namespace Core.DTO
     public record VideoGameDto
     {
         public int Id { get; set; }
-        public required string Name { get; set; }
-        public required DateOnly DatePublished { get; set; }
-        public required string Author { get; set; }
-        public required string Description { get; set; }
-        public required string GamePlatform { get; set; }
-        public required string Genre { get; set; }
+        [Required]
+        public string? Name { get; set; }
+        [Required]
+        public DateOnly DatePublished { get; set; }
+        [Required]
+        public string? Author { get; set; }
+        [Required]
+        public string? Description { get; set; }
+        [Required]
+        public string? GamePlatform { get; set; }
+        [Required]
+        public string? Genre { get; set; }
         public decimal? AggregateRating { get; set; }
     }
 }

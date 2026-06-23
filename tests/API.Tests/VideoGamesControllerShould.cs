@@ -1,10 +1,12 @@
 ﻿using Core.DTO;
 using Infrastructure.Data;
 using Infrastructure.Data.SeedData;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Tests
 {
@@ -87,7 +89,38 @@ namespace API.Tests
             Assert.Equal(payload.Description, updated.Description);
             Assert.Equal(payload.AggregateRating, updated.AggregateRating);
         }
+        [Fact]
+        public async Task Update_game_with_missing_required_field_returns_bad_request()
+        {
+            int gameId;
 
+            await using (var arrangeScope = _factory.Services.CreateAsyncScope())
+            {
+                var db = arrangeScope.ServiceProvider.GetRequiredService<GamesCatalogueContext>();
+                gameId = await db.VideoGames.Select(g => g.Id).FirstAsync();
+            }
+
+            // Missing "name" on purpose
+            var invalidPayload = new
+            {
+                id = gameId,
+                datePublished = "2024-01-15",
+                author = "Author",
+                description = "Description",
+                gamePlatform = "PC",
+                genre = "Action",
+                aggregateRating = 4.2
+            };
+
+            var response = await _client.PutAsJsonAsync($"/api/VideoGames/{gameId}", invalidPayload);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+            var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+            Assert.NotNull(problem);
+            Assert.True(problem?.Errors.Keys.Any(k => k.Contains("name", StringComparison.OrdinalIgnoreCase))
+                    , $"Error contains: {string.Join(", ", problem?.Errors?.Keys)}");
+        }
 
     }
 }
