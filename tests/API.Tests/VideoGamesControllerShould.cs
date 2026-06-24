@@ -123,5 +123,44 @@ namespace API.Tests
                     , $"Error contains: {string.Join(", ", problem?.Errors?.Keys)}");
         }
 
+        [Fact]
+        public async Task Get_list_async_second_page_returns_different_items_from_first_page()
+        {
+            var firstPageResponse = await _client.GetAsync("/api/VideoGames?pageNumber=1&pageSize=3");
+            var secondPageResponse = await _client.GetAsync("/api/VideoGames?pageNumber=2&pageSize=3");
+
+            Assert.Equal(HttpStatusCode.OK, firstPageResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, secondPageResponse.StatusCode);
+
+            var firstPage = await firstPageResponse.Content.ReadFromJsonAsync<PagedResult<VideoGameDto>>();
+            var secondPage = await secondPageResponse.Content.ReadFromJsonAsync<PagedResult<VideoGameDto>>();
+
+            Assert.NotNull(firstPage);
+            Assert.NotNull(secondPage);
+
+            var firstIds = firstPage.Items.Select(g => g.Id).ToHashSet();
+            var secondIds = secondPage.Items.Select(g => g.Id).ToHashSet();
+
+            Assert.Empty(firstIds.Intersect(secondIds));
+        }
+
+        [Fact]
+        public async Task Get_list_async_returns_correct_total_count_and_total_pages()
+        {
+            int totalGames;
+
+            await using (var scope = _factory.Services.CreateAsyncScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<GamesCatalogueContext>();
+                totalGames = await db.VideoGames.CountAsync();
+            }
+
+            var response = await _client.GetAsync("/api/VideoGames?pageNumber=1&pageSize=5");
+
+            var page = await response.Content.ReadFromJsonAsync<PagedResult<VideoGameDto>>();
+            Assert.NotNull(page);
+            Assert.Equal(totalGames, page.TotalCount);
+            Assert.Equal((int)Math.Ceiling((double)totalGames / 5), page.TotalPages);
+        }
     }
 }
