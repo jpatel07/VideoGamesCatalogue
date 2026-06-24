@@ -23,11 +23,15 @@ namespace API
             builder.Services.AddScoped<IVideoGameService, VideoGameService>();
 
             builder.Services.AddControllers();
+            builder.Services.AddProblemDetails();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
 
+            app.UseExceptionHandler();
+            app.UseStatusCodePages();
 
             try
             {
