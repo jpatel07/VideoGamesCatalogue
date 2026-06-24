@@ -17,10 +17,16 @@ namespace Infrastructure.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<VideoGameDto>> GetGamesAsync()
+        public async Task<PagedResult<VideoGameDto>> GetGamesAsync(int pageNumber, int pageSize)
         {
-            return await _context.VideoGames.OrderBy(g => g.Name).Select(
-                d => new VideoGameDto
+            var query = _context.VideoGames.OrderBy(g => g.Name);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(d => new VideoGameDto
                 {
                     Id = d.Id,
                     Name = d.Name,
@@ -30,8 +36,16 @@ namespace Infrastructure.Services
                     GamePlatform = d.GamePlatform,
                     Genre = d.Genre,
                     AggregateRating = d.AggregateRating
+                })
+                .ToListAsync();
 
-                }).ToListAsync();
+            return new PagedResult<VideoGameDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         public async Task UpdateAsync(VideoGameDto game)

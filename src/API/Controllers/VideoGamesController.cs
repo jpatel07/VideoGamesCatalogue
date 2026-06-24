@@ -21,9 +21,14 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<VideoGameDto>>> GetVideoGames()
+        public async Task<ActionResult<PagedResult<VideoGameDto>>> GetVideoGames(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
-            return Ok(await _gameService.GetGamesAsync());
+            if (pageNumber < 1) return BadRequest("pageNumber must be >= 1.");
+            if (pageSize < 1 || pageSize > 100) return BadRequest("pageSize must be between 1 and 100.");
+
+            return Ok(await _gameService.GetGamesAsync(pageNumber, pageSize));
         }
 
         [HttpPut("{id}")]

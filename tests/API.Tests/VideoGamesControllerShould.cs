@@ -48,9 +48,10 @@ namespace API.Tests
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            var games = await response.Content.ReadFromJsonAsync<List<VideoGameDto>>();
-            Assert.NotNull(games);
-            Assert.NotEmpty(games);
+            var page = await response.Content.ReadFromJsonAsync<PagedResult<VideoGameDto>>();
+            Assert.NotNull(page);
+            Assert.NotNull(page.Items);
+            Assert.NotEmpty(page.Items);
         }
         [Fact]
         public async Task Update_game_with_valid_payload_returns_no_content_and_persists_changes()

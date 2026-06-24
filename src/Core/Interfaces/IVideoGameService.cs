@@ -7,7 +7,7 @@ namespace Core.Interfaces
 {
     public interface IVideoGameService
     {
-        Task<IEnumerable<VideoGameDto>> GetGamesAsync();
+        Task<PagedResult<VideoGameDto>> GetGamesAsync(int pageNumber, int pageSize);
         Task UpdateAsync(VideoGameDto game);
     }
 }
