@@ -162,5 +162,34 @@ namespace API.Tests
             Assert.Equal(totalGames, page.TotalCount);
             Assert.Equal((int)Math.Ceiling((double)totalGames / 5), page.TotalPages);
         }
+
+        [Fact]
+        public async Task Get_by_id_returns_ok_and_matching_game()
+        {
+            int gameId;
+
+            await using (var arrangeScope = _factory.Services.CreateAsyncScope())
+            {
+                var db = arrangeScope.ServiceProvider.GetRequiredService<GamesCatalogueContext>();
+                var existing = await db.VideoGames.AsNoTracking().FirstAsync();
+                gameId = existing.Id;
+            }
+
+            var response = await _client.GetAsync($"/api/VideoGames/{gameId}");
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var game = await response.Content.ReadFromJsonAsync<VideoGameDto>();
+            Assert.NotNull(game);
+            Assert.Equal(gameId, game!.Id);
+        }
+
+        [Fact]
+        public async Task Get_by_id_with_unknown_id_returns_not_found()
+        {
+            var response = await _client.GetAsync("/api/VideoGames/-1");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
     }
 }

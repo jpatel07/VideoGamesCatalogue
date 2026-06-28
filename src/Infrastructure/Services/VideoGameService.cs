@@ -48,6 +48,25 @@ namespace Infrastructure.Services
             };
         }
 
+        public async Task<VideoGameDto?> GetByIdAsync(int id)
+        {
+            return await _context.VideoGames
+                .AsNoTracking()
+                .Where(g => g.Id == id)
+                .Select(d => new VideoGameDto
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    DatePublished = d.DatePublished,
+                    Author = d.Author,
+                    Description = d.Description,
+                    GamePlatform = d.GamePlatform,
+                    Genre = d.Genre,
+                    AggregateRating = d.AggregateRating
+                })
+                .FirstOrDefaultAsync();
+        }
+
         public async Task UpdateAsync(VideoGameDto game)
         {
             ArgumentNullException.ThrowIfNull(game.Name, nameof(game.Name));

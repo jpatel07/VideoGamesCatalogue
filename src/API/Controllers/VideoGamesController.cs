@@ -31,6 +31,17 @@ namespace API.Controllers
             return Ok(await _gameService.GetGamesAsync(pageNumber, pageSize));
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<VideoGameDto>> GetVideoGame(int id)
+        {
+            var game = await _gameService.GetByIdAsync(id);
+
+            if (game is null)
+                return NotFound();
+
+            return Ok(game);
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateGame(int id, VideoGameDto game)
         {
