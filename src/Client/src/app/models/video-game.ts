@@ -6,8 +6,10 @@ export interface VideoGame {
   description: string;
   gamePlatform: string;
   genre: string;
-  aggregateRating: number;
+  aggregateRating: number | null;
 }
+
+export type UpdateVideoGameRequest = Omit<VideoGame, 'id'>;
 
 export interface PageResult<T> {
   items: T[];
@@ -18,3 +20,4 @@ export interface PageResult<T> {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
+

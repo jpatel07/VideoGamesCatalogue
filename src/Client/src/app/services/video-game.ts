@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PageResult, VideoGame } from '../models/video-game';
+import { PageResult, UpdateVideoGameRequest, VideoGame } from '../models/video-game';
 @Injectable({ providedIn: 'root' })
 export class VideoGameServices {
   private http = inject(HttpClient);
@@ -17,7 +17,7 @@ export class VideoGameServices {
     return this.http.get<VideoGame>(`${this.baseUrl}/${id}`);
   }
 
-  update(game: VideoGame): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${game.id}`, game);
+  update(id: number, request: UpdateVideoGameRequest): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}`, request);
   }
 }

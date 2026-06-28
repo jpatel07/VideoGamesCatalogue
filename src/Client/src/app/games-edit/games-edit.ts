@@ -48,7 +48,8 @@ export class GamesEdit {
   save(row: VideoGame) {
     this.setStatus(row.id, { saving: true, saved: false, error: null });
 
-    this.gameService.update(row).subscribe({
+    const { id, ...request } = row;
+    this.gameService.update(id, request).subscribe({
       next: () => this.refreshRow(row.id, true),
       error: () => this.setStatus(row.id, { saving: false, saved: false, error: 'Failed to save.' }),
     });
