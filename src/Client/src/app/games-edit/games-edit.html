@@ -1,0 +1,76 @@
+<h2 class="mb-3">Edit Games</h2>
+
+@if (gamesResource.isLoading()) {
+  <p>Loading...</p>
+} @else if (gamesResource.error()) {
+  <div class="alert alert-danger">Failed to load games.</div>
+} @else if (gamesResource.value(); as r) {
+  <table class="table table-bordered table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Name</th>
+        <th>Genre</th>
+        <th>Platform</th>
+        <th>Author</th>
+        <th style="width: 110px">Rating</th>
+        <th style="white-space: nowrap; width: 170px">Published</th>
+        <th class="text-end" style="width: 230px">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (game of rows(); track game.id) {
+        @let status = statusFor(game.id);
+        <tr>
+          <td>
+            <input class="form-control form-control-sm" [(ngModel)]="game.name" />
+          </td>
+          <td>
+            <input class="form-control form-control-sm" [(ngModel)]="game.genre" />
+          </td>
+          <td>
+            <input class="form-control form-control-sm" [(ngModel)]="game.gamePlatform" />
+          </td>
+          <td>
+            <input class="form-control form-control-sm" [(ngModel)]="game.author" />
+          </td>
+          <td>
+            <input type="number" min="0" max="10" step="0.1"
+                   class="form-control form-control-sm" [(ngModel)]="game.aggregateRating" />
+          </td>
+          <td>
+            <input type="date" class="form-control form-control-sm" [(ngModel)]="game.datePublished" />
+          </td>
+          <td class="text-end" style="white-space: nowrap">
+            <button class="btn btn-sm btn-primary me-1"
+                    [disabled]="status.saving"
+                    (click)="save(game)">
+              @if (status.saving) {
+                <span class="spinner-border spinner-border-sm me-1" role="status"></span>Saving...
+              } @else {
+                Save
+              }
+            </button>
+            <button class="btn btn-sm btn-outline-secondary"
+                    [disabled]="status.saving"
+                    (click)="reset(game)">
+              Reset
+            </button>
+            @if (status.saved) {
+              <div class="small text-success mt-1">Saved</div>
+            }
+            @if (status.error) {
+              <div class="small text-danger mt-1">{{ status.error }}</div>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <ngb-pagination
+    [collectionSize]="r.totalCount"
+    [page]="pageNumber()"
+    [pageSize]="pageSize()"
+    (pageChange)="pageNumber.set($event)"
+  />
+}
