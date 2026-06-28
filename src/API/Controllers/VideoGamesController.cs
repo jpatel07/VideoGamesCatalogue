@@ -31,15 +31,23 @@ namespace API.Controllers
             return Ok(await _gameService.GetGamesAsync(pageNumber, pageSize));
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGame(int id, VideoGameDto game)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<VideoGameDto>> GetVideoGame(int id)
         {
-            if (id != game.Id)
-                return BadRequest();
+            var game = await _gameService.GetByIdAsync(id);
 
+            if (game is null)
+                return NotFound();
+
+            return Ok(game);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateGame(int id, UpdateVideoGameRequest request)
+        {
             try
             {
-                await _gameService.UpdateAsync(game);
+                await _gameService.UpdateAsync(id, request);
                 return NoContent();
             }
             catch (KeyNotFoundException)

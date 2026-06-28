@@ -1,0 +1,35 @@
+<h2 class="mb-3">Video Games</h2>
+
+@if (gamesResource.isLoading()) {
+  <p>Loading...</p>
+} @else if (gamesResource.value(); as r) {
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Name</th>
+        <th>Genre</th>
+        <th>Platform</th>
+        <th>Rating</th>
+        <th style="white-space: nowrap">Published</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (game of r.items; track game.id) {
+        <tr>
+          <td>{{ game.name }}</td>
+          <td>{{ game.genre }}</td>
+          <td>{{ game.gamePlatform }}</td>
+          <td>{{ game.aggregateRating }}</td>
+          <td style="white-space: nowrap">{{ game.datePublished | date: 'dd-MM-yyyy' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <ngb-pagination
+    [collectionSize]="r.totalCount"
+    [page]="pageNumber()"
+    [pageSize]="pageSize()"
+    (pageChange)="pageNumber.set($event)"
+  />
+}

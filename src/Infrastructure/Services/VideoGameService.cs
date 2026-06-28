@@ -48,28 +48,43 @@ namespace Infrastructure.Services
             };
         }
 
-        public async Task UpdateAsync(VideoGameDto game)
+        public async Task<VideoGameDto?> GetByIdAsync(int id)
         {
-            ArgumentNullException.ThrowIfNull(game.Name, nameof(game.Name));
-            ArgumentNullException.ThrowIfNull(game.Author, nameof(game.Author));
-            ArgumentNullException.ThrowIfNull(game.Description, nameof(game.Description));
-            ArgumentNullException.ThrowIfNull(game.GamePlatform, nameof(game.GamePlatform));
-            ArgumentNullException.ThrowIfNull(game.Genre, nameof(game.Genre));
+            return await _context.VideoGames
+                .AsNoTracking()
+                .Where(g => g.Id == id)
+                .Select(d => new VideoGameDto
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    DatePublished = d.DatePublished,
+                    Author = d.Author,
+                    Description = d.Description,
+                    GamePlatform = d.GamePlatform,
+                    Genre = d.Genre,
+                    AggregateRating = d.AggregateRating
+                })
+                .FirstOrDefaultAsync();
+        }
 
-            var entity = await _context.VideoGames.FirstOrDefaultAsync(g => g.Id == game.Id);
+        public async Task UpdateAsync(int id, UpdateVideoGameRequest request)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            var entity = await _context.VideoGames.FirstOrDefaultAsync(g => g.Id == id);
 
             if (entity is null)
             {
-                throw new KeyNotFoundException($"Video game with id {game.Id} was not found.");
+                throw new KeyNotFoundException($"Video game with id {id} was not found.");
             }
 
-            entity.Name = game.Name;
-            entity.DatePublished = game.DatePublished;
-            entity.Author = game.Author;
-            entity.Description = game.Description;
-            entity.GamePlatform = game.GamePlatform;
-            entity.Genre = game.Genre;
-            entity.AggregateRating = game.AggregateRating;
+            entity.Name = request.Name;
+            entity.DatePublished = request.DatePublished;
+            entity.Author = request.Author;
+            entity.Description = request.Description;
+            entity.GamePlatform = request.GamePlatform;
+            entity.Genre = request.Genre;
+            entity.AggregateRating = request.AggregateRating;
 
             await _context.SaveChangesAsync();
         }
