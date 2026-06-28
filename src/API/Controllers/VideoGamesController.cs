@@ -43,14 +43,11 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGame(int id, VideoGameDto game)
+        public async Task<IActionResult> UpdateGame(int id, UpdateVideoGameRequest request)
         {
-            if (id != game.Id)
-                return BadRequest();
-
             try
             {
-                await _gameService.UpdateAsync(game);
+                await _gameService.UpdateAsync(id, request);
                 return NoContent();
             }
             catch (KeyNotFoundException)

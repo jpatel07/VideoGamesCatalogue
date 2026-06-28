@@ -65,9 +65,8 @@ namespace API.Tests
                 gameId = existing.Id;
             }
 
-            var payload = new VideoGameDto
+            var payload = new UpdateVideoGameRequest
             {
-                Id = gameId,
                 Name = "Updated Integration Test Game",
                 DatePublished = new DateOnly(2024, 1, 15),
                 Author = "Integration Test Author",

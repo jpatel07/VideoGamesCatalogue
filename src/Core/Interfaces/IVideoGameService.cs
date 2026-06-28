@@ -9,6 +9,6 @@ namespace Core.Interfaces
     {
         Task<PagedResult<VideoGameDto>> GetGamesAsync(int pageNumber, int pageSize);
         Task<VideoGameDto?> GetByIdAsync(int id);
-        Task UpdateAsync(VideoGameDto game);
+        Task UpdateAsync(int id, UpdateVideoGameRequest request);
     }
 }
